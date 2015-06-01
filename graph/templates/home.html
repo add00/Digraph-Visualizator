@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+{% load bootstrap %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="../../favicon.ico">
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
+        <link href="{% static 'css/joint.css' %}" rel="stylesheet" media="screen">
+        <link href="{% static 'css/graph.css' %}" rel="stylesheet" media="screen">
+        <title>Piotr Bajsarowicz. Nr indeksu: <strong>108605</strong></title>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse">
+            <div class="container">
+                <div class="navbar-header" style="float:left">
+                    <a class="navbar-brand" href="#">DiGraph Visualization</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#serialization">Serialization</a>
+                        </li>
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#modal">Create graph</a>
+                        </li>
+                        <li class="active">
+                            <a href="#" data-toggle="modal" data-target="#about-me">108605</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="container">
+                <form action="/" role="form" method="post">{% csrf_token %}
+                    <ul class="nav navbar-nav list-inline table">
+                        <li>
+                            <div class="input-group {% if form.graph.errors %} has-error {% endif %}">
+                                <span class="input-group-addon" id="sizing-addon2">Graph</span>
+                                {{ form.graph }}
+                            </div>
+                        </li>
+                        <li>
+                            <div class="input-group {% if form.index.errors %} has-error {% endif %}">
+                                <span class="input-group-addon" id="sizing-addon2">@</span>
+                                <input type="text" class="form-control" placeholder="Vertex Index" aria-describedby="sizing-addon2" name="{{ form.index.name }}" id="id_{{ form.index.name }}" value="{% if form.index.value %}{{ form.index.value }}{% endif %}">
+                            </div>
+                        </li>
+                        <li>
+                            <div class="input-group {% if form.x.errors %} has-error {% endif %}">
+                                <span class="input-group-addon" id="sizing-addon2">x</span>
+                                <input type="text" class="form-control" placeholder="Position x" aria-describedby="sizing-addon2" name="{{ form.x.name }}" id="id_{{ form.x.name }}" value="{% if form.x.value %}{{ form.x.value }}{% endif %}">
+                            </div>
+                        </li>
+                        <li>
+                            <div class="input-group {% if form.y.errors %} has-error {% endif %}">
+                                <span class="input-group-addon" id="sizing-addon2">y</span>
+                                <input type="text" class="form-control" placeholder="Position y" aria-describedby="sizing-addon2" name="{{ form.y.name }}" id="id_{{ form.y.name }}" value="{% if form.y.value %}{{ form.y.value }}{% endif %}">
+                            </div>
+                        </li>
+                        <li>
+                            <ul class="list-inline action">
+                                <li><input class="btn btn-primary" type="submit" value="Submit" data-toggle="tooltip" data-placement="bottom" title="Select graph and populate all fields to add a new node and click on this button"/></li>
+                                <li><input class="btn btn-primary" type="button" value="Update" onclick="updateGraph()" data-toggle="tooltip" data-placement="bottom" title="Select only graph, add new arc, change position and click on this button"/></li>
+                                <li><input class="btn btn-primary" type="button" value="Remove" onclick="removeGraphOrNode()" data-toggle="tooltip" data-placement="bottom" title="Select only graph to remove graph or populate a 'Vertex Index' input to remove a node, and click on this button"/></li>
+                                <li id="error-popup">
+                                {{deserialization_form.errors}}
+                                {{form.errors}}
+                                    {% if form.errors %}
+                                    <div class="left-padding alert alert-danger" role="alert">
+                                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                        Invalid form inputs
+                                    </div>
+                                    {% else %}
+                                    <div id="error-message"></div>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+        </nav>
+        <div class="ruler"></div>
+        <div class="container">
+            <div id="paper-restrict"></div>
+        </div>
+
+        <!-- Main Modal -->
+        <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="/" role="form" method="post">{% csrf_token %}
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="modal-label">Create new graph</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>Please, provide graph name:</p>
+                            <div class="input-group">
+                                <span class="input-group-addon" id="sizing-addon2">Name</span>
+                                <input type="text" class="form-control" placeholder="Graph Name" aria-describedby="sizing-addon2" name="{{ graph_form.prefix}}-{{ graph_form.name.name }}" id="id_{{ graph_form.prefix}}-{{ graph_form.name.name }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Dismiss</button>
+                            <button class="btn btn-default" type="submit">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Me Modal -->
+        <div class="modal fade" id="about-me" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modal-label">Piotr Bajsarowicz 108605</h4>
+                        <h4 class="modal-title" id="modal-label">Grupa dziekańska 1A</h4>
+                        <h4 class="modal-title" id="modal-label">Informatyka WI, semestr VIII</h4>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Hide</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Serialization Modal -->
+        <div class="modal fade" id="serialization" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modal-label">Create new graph</h4>
+                    </div>
+                    <div class="modal-body modal-header">
+                        <p>Serialize graphs:</p>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="sizing-addon2">File name</span>
+                            <input type="text" class="form-control" id="file-name" placeholder="File Name">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" onclick="getSerializedGraph()">Serialize</button>
+                            </span>
+                        </div>
+
+                    </div>
+                    <div class="modal-body">
+                        <form action="/" role="form" method="post" enctype="multipart/form-data">{% csrf_token %}
+                            <p>Deserialize graphs:</p>
+                            <div class="input-group">
+                                <span class="input-group-addon" id="sizing-addon2">File</span>
+                                {{ deserialization_form.file }}
+                                <span class="input-group-btn">
+                                    <input class="btn btn-default" type="submit" value="Deserialize" />
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Dismiss</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
+        <script src="{% static 'js/joint.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/graph.js' %}"></script>
+        <script src="{% static 'js/joint.shapes.devs.js' %}"></script>
+    </body>
+</html>

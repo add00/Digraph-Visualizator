@@ -1,0 +1,33 @@
+.table {
+    padding: 20px 0;
+}
+
+.table li {
+    width: 170px;
+}
+
+.action {
+    width: 460px;
+
+}
+.action li {
+    width: 70px;
+    margin-right: 5px;
+}
+
+.alert {
+  padding: 5px 10px;
+  margin-bottom: 0px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  width: 240px;
+  height: 34px;
+}
+
+.glyphicon {
+  margin-right: 10px;
+}
+
+#error-popup {
+  padding-left: 10px;
+}
