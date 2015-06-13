@@ -22,7 +22,7 @@ function clearGraphOnLoad() {
  * Loads graph.
  */
 function loadGraph() {
-    selectedGraphID = $("#id_graph").val();
+    selectedGraphID = $("#id_graph").find(':selected').val();
     $.ajax({
         type: 'GET',
         url: '/api/v1/graph/' + selectedGraphID,
@@ -129,7 +129,7 @@ function updateGraph() {
     sendData.push({name: 'arc-MAX_NUM_FORMS', value: 1000});
 
     sendData.push({name: 'csrfmiddlewaretoken', value: $("input[name='csrfmiddlewaretoken']").val()});
-    debugger;
+
     $.ajax({
         type: 'POST',
         url: '/api/v1/arc/' + selectedGraphID,
